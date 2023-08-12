@@ -34,12 +34,12 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
     body {
       font-family: Arial, sans-serif;
       background-color: #fcfcfc;
-      padding: 20px;
+      padding: 10px;
     }
 
     h1 {
-      font-size: 24px;
-      margin-bottom: 20px;
+      font-size: 20px;
+      margin-bottom: 10px;
     }
 
     div, section { margin-bottom: 10px; }
@@ -49,7 +49,29 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
       text-align: right;
     }
 
+    #configuration {
+      max-width: 800px;
+      display: flex
+      flex-wrap: wrap;
+    }
+    
+    #configuration div div {
+      white-space: nowrap
+    }
+    
+    #configuration div *, #configuration div div * {
+      display: inline;
+    }
+    
+    #configuration select, #configuration option, #configuration input {
+      flex: flex-grow
+    }
+    
+
     select, option { min-width: 150px; }
+    
+    input[type="text"] { min-width: 50px; }
+
 
     select, input {
       padding: 5px;
@@ -63,7 +85,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
       width: 90%;
     }
 
-    table.rounds {
+    .rounds table {
       border-collapse: collapse;
       margin-bottom: 20px;
     }
@@ -82,100 +104,111 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
 </head>
 <body>
   <h1>BTD6 Hero Experience Calculator</h1>
-  <div class="configuration">
-    <section>
-      <table>
-        <tr>
-          <td><label for="hero">Hero:</label></td>
-          <td>
-            <select name="hero" id="hero">
-              <option value="brickell" data-hero-xp-ratio="1.425" selected="selected">Admiral Brickell</option>
-              <option value="adora" data-hero-xp-ratio="1.71">Adora</option>
-              <option value="benjamin" data-hero-xp-ratio="1.5">Benjamin</option>
-              <option value="churchill" data-hero-xp-ratio="1.71">Captain Churchill</option>
-              <option value="etienne" data-hero-xp-ratio="1">Etienne</option>
-              <option value="ezili" data-hero-xp-ratio="1.425">Ezili</option>
-              <option value="geraldo" data-hero-xp-ratio="1">Geraldo</option>
-              <option value="gwendolin" data-hero-xp-ratio="1">Gwendolin</option>
-              <option value="obyn" data-hero-xp-ratio="1">Obyn Greenfoot</option>
-              <option value="pat" data-hero-xp-ratio="1.425">Pat Fusty</option>
-              <option value="psi" data-hero-xp-ratio="1.5">Psi</option>
-              <option value="quincy" data-hero-xp-ratio="1">Quincy</option>
-              <option value="sauda" data-hero-xp-ratio="1.425">Sauda</option>
-              <option value="striker" data-hero-xp-ratio="1">Striker Jones</option>
-              <option value="custom" data-hero-xp-ratio="1">Custom</option>
-            </select>
-          </td>
-          <td><label for="hero-xp-ratio">Hero XP Ratio:</label></td>
-          <td><input type="text" id="hero-xp-ratio" name="hero-xp-ratio" value="1.425"></td>
-        </tr>
-        <tr>
-          <td><label for="map">Map:</label></td>
-          <td>
-            <select name="map" id="map">
-              <option value="beginner" data-map-xp-bonus="1" selected="selected">Beginner</option>
-              <option value="intermediate" data-map-xp-bonus="1.1">Intermediate</option>
-              <option value="advanced" data-map-xp-bonus="1.2">Advanced</option>
-              <option value="expert" data-map-xp-bonus="1.3">Expert</option>
-              <option value="custom" data-map-xp-bonus="1.3">Custom</option>
-            </select>
-          </td>
-          <td><label for="map-xp-bonus">Map XP Bonus:</label></td>
-          <td><input type="text" id="map-xp-bonus" name="map-xp-bonus" value="1"></td>
-        </tr>
-        <tr>
-          <td><label for="mode">Mode:</label></td>
-          <td>
-            <select name="mode" id="mode">
-              <option value="easy" data-start-round="1" data-end-round="40" selected="selected">Easy</option>
-              <option value="deflation" data-start-round="31" data-end-round="60">Deflation</option>
-              <option value="medium" data-start-round="1" data-end-round="60">Medium</option>
-              <option value="hard" data-start-round="3" data-end-round="80">Hard</option>
-              <option value="impoppable" data-start-round="6" data-end-round="100">Impoppable</option>
-              <option value="chimps" data-start-round="6" data-end-round="100">Chimps</option>
-              <option value="custom" data-start-round="1" data-end-round="140">Custom</option>
-            </select>
-          </td>
-          <td><label for="start-round">Start Round:</label></td>
-          <td><input type="number" id="start-round" name="start-round" value="1" min="1"></td>
-          <td><label for="end-round">End Round:</label></td>
-          <td><input type="number" id="end-round" name="end-round" value="40" max="140"></td>
-        </tr>
-      </table>
-    </section>
-    <section>
+  <section id="configuration">
+    <div>
+      <div>
+
+        <label for="hero">Hero:</label>
+        <select name="hero" id="hero">
+          <option value="brickell" data-hero-xp-ratio="1.425" selected="selected">Admiral Brickell</option>
+          <option value="adora" data-hero-xp-ratio="1.71">Adora</option>
+          <option value="benjamin" data-hero-xp-ratio="1.5">Benjamin</option>
+          <option value="churchill" data-hero-xp-ratio="1.71">Captain Churchill</option>
+          <option value="etienne" data-hero-xp-ratio="1">Etienne</option>
+          <option value="ezili" data-hero-xp-ratio="1.425">Ezili</option>
+          <option value="geraldo" data-hero-xp-ratio="1">Geraldo</option>
+          <option value="gwendolin" data-hero-xp-ratio="1">Gwendolin</option>
+          <option value="obyn" data-hero-xp-ratio="1">Obyn Greenfoot</option>
+          <option value="pat" data-hero-xp-ratio="1.425">Pat Fusty</option>
+          <option value="psi" data-hero-xp-ratio="1.5">Psi</option>
+          <option value="quincy" data-hero-xp-ratio="1">Quincy</option>
+          <option value="sauda" data-hero-xp-ratio="1.425">Sauda</option>
+          <option value="striker" data-hero-xp-ratio="1">Striker Jones</option>
+          <option value="custom" data-hero-xp-ratio="1">Custom</option>
+        </select>
+      </div>
+      <div>
+
+        <label for="hero-xp-ratio">Hero XP Ratio:</label>
+        <input type="text" id="hero-xp-ratio" name="hero-xp-ratio" value="1.425">
+      </div>
+    </div>
+    <div>
+      <div>
+
+        <label for="map">Map:</label>
+        <select name="map" id="map">
+          <option value="beginner" data-map-xp-bonus="1" selected="selected">Beginner</option>
+          <option value="intermediate" data-map-xp-bonus="1.1">Intermediate</option>
+          <option value="advanced" data-map-xp-bonus="1.2">Advanced</option>
+          <option value="expert" data-map-xp-bonus="1.3">Expert</option>
+          <option value="custom" data-map-xp-bonus="1.3">Custom</option>
+        </select>
+      </div>
+      <div>
+
+        <label for="map-xp-bonus">Map XP Bonus:</label>
+        <input type="text" id="map-xp-bonus" name="map-xp-bonus" value="1">
+      </div>
+    </div>
+    <div>
+      <div>
+        <label for="mode">Mode:</label>
+        <select name="mode" id="mode">
+          <option value="easy" data-start-round="1" data-end-round="40" selected="selected">Easy</option>
+          <option value="deflation" data-start-round="31" data-end-round="60">Deflation</option>
+          <option value="medium" data-start-round="1" data-end-round="60">Medium</option>
+          <option value="hard" data-start-round="3" data-end-round="80">Hard</option>
+          <option value="impoppable" data-start-round="6" data-end-round="100">Impoppable</option>
+          <option value="chimps" data-start-round="6" data-end-round="100">Chimps</option>
+          <option value="custom" data-start-round="1" data-end-round="140">Custom</option>
+        </select>
+      </div>
+      <div>
+
+        <label for="start-round">Start Round:</label>
+        <input type="number" id="start-round" name="start-round" value="1" min="1">
+      </div>
+      <div>
+
+        <label for="end-round">End Round:</label>
+        <input type="number" id="end-round" name="end-round" value="40" max="140">
+      </div>
+    </div>
+    <div>
       <label for="coop-mode">Co-Op Mode:</label>
       <input type="checkbox" id="coop-mode" name="coop-mode">
-    </section>
-    <section id="monkey-knowledge">
-      <div>
-        <label for="all-monkey-knowledge">Monkey Knowledge:</label>
-        <input type="checkbox" id="all-monkey-knowledge" name="all-monkey-knowledge" checked="true">
-      </div>
-      <div title="All monkeys XP earn rate increased by 8%">
-        <input type="checkbox" id="monkey-education" name="monkey-education" checked="true">
-        <label for="monkey-education">Monkey Education</label>
-      </div>
-      <div>
-        <input type="checkbox" id="scholarships" name="scholarships" checked="true">
-        <label for="scholarships" title="Hero training costs reduced by 10%">Scholarships</label>
-      </div>
-      <div>
-        <input type="checkbox" id="self-taught-heroes" name="self-taught-heroes" checked="true">
-        <label for="self-taught-heroes" title="Heroes earn XP 10% faster">Self Taught Heroes</label>
-      </div>
-      <div>
-        <input type="checkbox" id="empowered-heroes" name="empowered-heroes" checked="true">
-        <label for="empowered-heroes" title="Heroes start each game at level 3">Empowered Heroes</label>
-      </div>
-      <div>
-        <input type="checkbox" id="monkeys-together-strong" name="monkeys-together-strong" checked="true">
-        <label for="monkeys-together-strong" title="Heroes receive 5% more experience per each Hero placed">Monkeys Together Strong</label>
-      </div>
-    </section>
-  </div>
-  <section>
-    <table class="rounds">
+    </div>
+  </section>
+  <section id="monkey-knowledge">
+    <div>
+      <label for="all-monkey-knowledge">Monkey Knowledge:</label>
+      <input type="checkbox" id="all-monkey-knowledge" name="all-monkey-knowledge" checked="true">
+    </div>
+
+    <div title="All monkeys XP earn rate increased by 8%">
+      <input type="checkbox" id="monkey-education" name="monkey-education" checked="true">
+      <label for="monkey-education">Monkey Education</label>
+    </div>
+    <div>
+      <input type="checkbox" id="scholarships" name="scholarships" checked="true">
+      <label for="scholarships" title="Hero training costs reduced by 10%">Scholarships</label>
+    </div>
+    <div>
+      <input type="checkbox" id="self-taught-heroes" name="self-taught-heroes" checked="true">
+      <label for="self-taught-heroes" title="Heroes earn XP 10% faster">Self Taught Heroes</label>
+    </div>
+    <div>
+      <input type="checkbox" id="empowered-heroes" name="empowered-heroes" checked="true">
+      <label for="empowered-heroes" title="Heroes start each game at level 3">Empowered Heroes</label>
+    </div>
+    <div>
+      <input type="checkbox" id="monkeys-together-strong" name="monkeys-together-strong" checked="true">
+      <label for="monkeys-together-strong" title="Heroes receive 5% more experience per each Hero placed">Monkeys Together Strong</label>
+    </div>
+  </section>
+  <section class="rounds">
+    <table>
       <thead>
         <th class="round">Round</th>
         <th class="hero-placed" title="Whether or not the hero is placed before the end of round">Hero Placed</th>
