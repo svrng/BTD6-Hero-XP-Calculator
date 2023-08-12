@@ -54,24 +54,22 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
       display: flex
       flex-wrap: wrap;
     }
-    
+
     #configuration div div {
       white-space: nowrap
     }
-    
+
     #configuration div *, #configuration div div * {
       display: inline;
     }
-    
+
     #configuration select, #configuration option, #configuration input {
       flex: flex-grow
     }
-    
 
     select, option { min-width: 150px; }
-    
-    input[type="text"] { min-width: 50px; }
 
+    input[type="text"] { min-width: 50px; }
 
     select, input {
       padding: 5px;
@@ -100,6 +98,23 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
       background-color: #e8e8e8;
       font-weight: bold;
     }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #1a1a1a;
+        color: #ccc;
+      }
+      select, input {
+        background-color: #444;
+        color: #ccc;
+      }
+      .rounds th {
+        background-color: #373737;
+      }
+      .rounds th, .rounds td {
+        border: 1px solid #555555;
+      }
+    }
   </style>
 </head>
 <body>
@@ -107,35 +122,32 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
   <section id="configuration">
     <div>
       <div>
-
         <label for="hero">Hero:</label>
         <select name="hero" id="hero">
-          <option value="brickell" data-hero-xp-ratio="1.425" selected="selected">Admiral Brickell</option>
-          <option value="adora" data-hero-xp-ratio="1.71">Adora</option>
-          <option value="benjamin" data-hero-xp-ratio="1.5">Benjamin</option>
-          <option value="churchill" data-hero-xp-ratio="1.71">Captain Churchill</option>
-          <option value="etienne" data-hero-xp-ratio="1">Etienne</option>
-          <option value="ezili" data-hero-xp-ratio="1.425">Ezili</option>
-          <option value="geraldo" data-hero-xp-ratio="1">Geraldo</option>
-          <option value="gwendolin" data-hero-xp-ratio="1">Gwendolin</option>
-          <option value="obyn" data-hero-xp-ratio="1">Obyn Greenfoot</option>
-          <option value="pat" data-hero-xp-ratio="1.425">Pat Fusty</option>
-          <option value="psi" data-hero-xp-ratio="1.5">Psi</option>
-          <option value="quincy" data-hero-xp-ratio="1">Quincy</option>
-          <option value="sauda" data-hero-xp-ratio="1.425">Sauda</option>
-          <option value="striker" data-hero-xp-ratio="1">Striker Jones</option>
+          <option value="brickell" data-hero-xp-ratio="1.425" data-base-cost="900" selected="selected">Admiral Brickell</option>
+          <option value="adora" data-hero-xp-ratio="1.71" data-base-cost="1000">Adora</option>
+          <option value="benjamin" data-hero-xp-ratio="1.5" data-base-cost="1200">Benjamin</option>
+          <option value="churchill" data-hero-xp-ratio="1.71" data-base-cost="2000">Captain Churchill</option>
+          <option value="etienne" data-hero-xp-ratio="1" data-base-cost="850">Etienne</option>
+          <option value="ezili" data-hero-xp-ratio="1.425" data-base-cost="600">Ezili</option>
+          <option value="geraldo" data-hero-xp-ratio="1" data-base-cost="700">Geraldo</option>
+          <option value="gwendolin" data-hero-xp-ratio="1" data-base-cost="725">Gwendolin</option>
+          <option value="obyn" data-hero-xp-ratio="1" data-base-cost="650">Obyn Greenfoot</option>
+          <option value="pat" data-hero-xp-ratio="1.425" data-base-cost="800">Pat Fusty</option>
+          <option value="psi" data-hero-xp-ratio="1.5" data-base-cost="1000">Psi</option>
+          <option value="quincy" data-hero-xp-ratio="1" data-base-cost="540">Quincy</option>
+          <option value="sauda" data-hero-xp-ratio="1.425" data-base-cost="600">Sauda</option>
+          <option value="striker" data-hero-xp-ratio="1" data-base-cost="750">Striker Jones</option>
           <option value="custom" data-hero-xp-ratio="1">Custom</option>
         </select>
       </div>
       <div>
-
         <label for="hero-xp-ratio">Hero XP Ratio:</label>
         <input type="text" id="hero-xp-ratio" name="hero-xp-ratio" value="1.425">
       </div>
     </div>
     <div>
       <div>
-
         <label for="map">Map:</label>
         <select name="map" id="map">
           <option value="beginner" data-map-xp-bonus="1" selected="selected">Beginner</option>
@@ -146,7 +158,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         </select>
       </div>
       <div>
-
         <label for="map-xp-bonus">Map XP Bonus:</label>
         <input type="text" id="map-xp-bonus" name="map-xp-bonus" value="1">
       </div>
@@ -155,13 +166,12 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
       <div>
         <label for="mode">Mode:</label>
         <select name="mode" id="mode">
-          <option value="easy" data-start-round="1" data-end-round="40" selected="selected">Easy</option>
-          <option value="deflation" data-start-round="31" data-end-round="60">Deflation</option>
-          <option value="medium" data-start-round="1" data-end-round="60">Medium</option>
-          <option value="hard" data-start-round="3" data-end-round="80">Hard</option>
-          <option value="impoppable" data-start-round="6" data-end-round="100">Impoppable</option>
-          <option value="chimps" data-start-round="6" data-end-round="100">Chimps</option>
-          <option value="custom" data-start-round="1" data-end-round="140">Custom</option>
+          <option value="easy" data-start-round="1" data-end-round="40" data-cost-modifier="0.85" selected="selected">Easy</option>
+          <option value="deflation" data-start-round="31" data-end-round="60" data-cost-modifier="0.85">Deflation</option>
+          <option value="medium" data-start-round="1" data-end-round="60" data-cost-modifier="1">Medium</option>
+          <option value="hard" data-start-round="3" data-end-round="80" data-cost-modifier="1.08">Hard</option>
+          <option value="impoppable" data-start-round="6" data-end-round="100" data-cost-modifier="1.2">Impoppable</option>
+          <option value="chimps" data-start-round="6" data-end-round="100" data-cost-modifier="1.08">Chimps</option>
         </select>
       </div>
       <div>
@@ -218,6 +228,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         <th class="energizer" title="Whether or not the hero is within range of a 5xx energizer before the end of round">Energizer</th>
         <th class="hero-level" title="Hero level at the start of round">Hero Level</th>
         <th class="upgrade-cost" title="Cost to upgrade hero to the next level at the start of round">Upgrade Cost</th>
+        <th class="amount-spent" title="The cumulative amount spent placing the hero and leveling it">Amount Spent</th>
       </thead>
       <tbody id="rounds-table">
       </tbody>
@@ -253,6 +264,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
       const energizerByRound = [];
       const heroLevelByRound = [];
       const upgradeCostByRound = [];
+      const amountSpentByRound = [];
 
       for (let round = minRound; round <= maxRound; round++) {
         let row = table.insertRow();
@@ -299,7 +311,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         levelUpgradesElement.title = 'The number of levels the hero is upgraded before the end of round ' + round;
         levelUpgradesElement.type = 'number'
         levelUpgradesElement.min = 0;
-        levelUpgradesElement.max = 20;
+        levelUpgradesElement.max = 19;
         levelUpgradesElement.value = 0;
         levelUpgradesCell.appendChild(levelUpgradesElement);
         levelUpgradesByRound.push(levelUpgradesElement);
@@ -341,18 +353,30 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         upgradeCostCell.title = 'Cost to upgrade hero to the next level at the start of round ' + round;
         upgradeCostCell.innerHtml = '';
         upgradeCostByRound.push(upgradeCostCell);
+
+        let amountSpentCell = row.insertCell();
+        amountSpentCell.classList.add('amount-spent');
+        amountSpentCell.title = 'The cumulative amount spent placing the hero and leveling it as of round ' + round;
+        amountSpentCell.innerHtml = '';
+        amountSpentByRound.push(amountSpentCell);
       }
 
       function recalculate() {
         let cumulativeXpAtStartOfRound = 0;
+        let cumulativeAmountSpent = 0;
         for (let round = minRound; round <= maxRound; round++) {
           let roundIndex = round - minRound;
           if (!heroPlacedByRound[roundIndex].checked) {
             cumulativeXpAtStartOfRound = 0;
+            cumulativeAmountSpent = 0;
           } else if (empoweredHeroesElement.checked && (round === minRound || !heroPlacedByRound[roundIndex - 1].checked)) {
             cumulativeXpAtStartOfRound = getMinimumTotalXpAtLevel(3);
+            cumulativeAmountSpent = getHeroPlacementCost();
           }
-          cumulativeXpAtStartOfRound += getXpFromUpgrades(round, cumulativeXpAtStartOfRound);
+          let [upgradeXp, amountSpent] = getXpAndCostFromUpgrades(round, cumulativeXpAtStartOfRound);
+          cumulativeAmountSpent += amountSpent;
+          cumulativeXpAtStartOfRound += upgradeXp;
+          cumulativeXpAtStartOfRound += getXpFromAdoraSacrifices(round);
           let [level, remainingXp] = getHeroLevelAndNextLevelXp(cumulativeXpAtStartOfRound);
           let costToUpgrade = getCostToUpgrade(remainingXp);
           cumulativeXpAtStartOfRound += getEndOfRoundXp(round);
@@ -363,9 +387,11 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
             } else {
               upgradeCostByRound[roundIndex].innerText = costToUpgrade;
             }
+            amountSpentByRound[roundIndex].innerText = cumulativeAmountSpent;
           } else {
             heroLevelByRound[roundIndex].innerText = '';
             upgradeCostByRound[roundIndex].innerText = '';
+            amountSpentByRound[roundIndex].innerText = '';
           }
           console.log("Round:", round);
           console.log("  Base XP:", getBaseEndOfRoundXp(round));
@@ -435,25 +461,49 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         return xp;
       }
 
-      function getXpFromUpgrades(round, cumulativeXp) {
+      function getHeroPlacementCost() {
+        let baseCost = parseInt(heroElement.options[heroElement.selectedIndex].getAttribute('data-base-cost'));
+        if (isNaN(baseCost)) {
+          return 0;
+        }
+        let costModifier = parseFloat(mapElement.options[mapElement.selectedIndex].getAttribute('data-cost-modifier'));
+        if (isNaN(costModifier)) {
+          costModifier = 1;
+        }
+        if (empoweredHeroesElement.checked) {
+          return baseCost * costModifier * 0.9;
+        } else {
+          return baseCost * costModifier;
+        }
+      }
+
+      function getXpAndCostFromUpgrades(round, cumulativeXp) {
         let roundIndex = round - minRound;
         let levelUpgrades = parseInt(levelUpgradesByRound[roundIndex].value);
         if (isNaN(levelUpgrades)) {
           levelUpgrades = 0;
         }
         let xp = 0;
+        let cost = 0;
         for (let i = 0; i < levelUpgrades; i++) {
           let [level, remainingXp] = getHeroLevelAndNextLevelXp(cumulativeXp);
+          let upgradeCost = getCostToUpgrade(remainingXp);
+          if (!isNaN(upgradeCost)) {
+            cost += upgradeCost;
+          }
           xp += remainingXp;
           cumulativeXp += remainingXp;
         }
+        return [xp, cost];
+      }
+
+      function getXpFromAdoraSacrifices(round) {
+        let roundIndex = round - minRound;
         let adoraXp = parseInt(adoraSacrificesByRound[roundIndex].value);
         if (isNaN(adoraXp)) {
           adoraXp = 0;
         }
-        xp += adoraXp;
-        console.log('  Upgrade XP:', xp);
-        return xp;
+        return adoraXp;
       }
 
       function getHeroLevelAndNextLevelXp(cumulativeXp) {
