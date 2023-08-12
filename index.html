@@ -63,13 +63,12 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
       display: inline;
     }
 
-    #configuration select, #configuration option, #configuration input {
-      flex: flex-grow
-    }
-
     select, option { min-width: 150px; }
 
-    input[type="text"] { min-width: 50px; }
+    #configuration input[type="text"], #configuration input[type="number"] {
+      min-width: 50px;
+      margin-top: 3px;
+    }
 
     select, input {
       padding: 5px;
@@ -175,19 +174,23 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         </select>
       </div>
       <div>
-
         <label for="start-round">Start Round:</label>
         <input type="number" id="start-round" name="start-round" value="1" min="1">
       </div>
       <div>
-
         <label for="end-round">End Round:</label>
         <input type="number" id="end-round" name="end-round" value="40" max="140">
       </div>
     </div>
     <div>
-      <label for="coop-mode">Co-Op Mode:</label>
-      <input type="checkbox" id="coop-mode" name="coop-mode">
+      <div>
+        <label for="coop-mode">Co-Op Mode:</label>
+        <input type="checkbox" id="coop-mode" name="coop-mode">
+      </div>
+      <div>
+        <label for="show-costs">Show Costs:</label>
+        <input type="checkbox" id="show-costs" name="show-costs" checked="true">
+      </div>
     </div>
   </section>
   <section id="monkey-knowledge">
@@ -247,6 +250,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
       const startRoundElement = document.getElementById('start-round');
       const endRoundElement = document.getElementById('end-round');
       const coopModeElement = document.getElementById('coop-mode');
+      const showCostsElement = document.getElementById('show-costs');
       const allMonkeyKnowledgeElement = document.getElementById('all-monkey-knowledge');
       const monkeyEducationElement = document.getElementById('monkey-education');
       const selfTaughtHeroesElement = document.getElementById('self-taught-heroes');
@@ -265,6 +269,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
       const heroLevelByRound = [];
       const upgradeCostByRound = [];
       const amountSpentByRound = [];
+      const minimumTotalXpAtLevel = [];
 
       for (let round = minRound; round <= maxRound; round++) {
         let row = table.insertRow();
@@ -362,6 +367,85 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
       }
 
       function recalculate() {
+        function getEndOfRoundXp(round) {
+          let roundIndex = round - minRound;
+          if (!heroPlacedByRound[roundIndex].checked) {
+            return 0;
+          }
+          let totalNumberOfHeroes = parseInt(coopHeroesByRound[roundIndex].value);
+          if (isNaN(totalNumberOfHeroes)) {
+            totalNumberOfHeroes = 0;
+          }
+          if (heroPlacedByRound[roundIndex].checked) {
+            totalNumberOfHeroes += 1;
+          }
+          let baseEndOfRoundXp = 90 * round - 2880;
+          if (round < 21) {
+            baseEndOfRoundXp = 20 * round + 20;
+          } else if (round < 51) {
+            baseEndOfRoundXp = 40 * round - 380;
+          }
+          let xpModifier = parseFloat(mapExperienceElement.value);
+          if (isNaN(xpModifier)) {
+            xpModifier = parseFloat(mapElement.options[mapElement.selectedIndex].getAttribute('data-map-xp-bonus'));
+          }
+          if (selfTaughtHeroesElement.checked) {
+            xpModifier *= 1.1;
+          }
+          if (monkeyEducationElement.checked) {
+            xpModifier *= 1.08;
+          }
+          if (monkeysTogetherStrongElement.checked) {
+            xpModifier *= 1 + totalNumberOfHeroes * 0.05;
+          }
+          if (energizerByRound[roundIndex].checked) {
+            xpModifier *= 1.5;
+          }
+          let xp = baseEndOfRoundXp * xpModifier / totalNumberOfHeroes;
+          return xp;
+        }
+        function getHeroPlacementCost() {
+          let baseCost = parseInt(heroElement.options[heroElement.selectedIndex].getAttribute('data-base-cost'));
+          if (isNaN(baseCost)) {
+            return 0;
+          }
+          let costModifier = parseFloat(modeElement.options[modeElement.selectedIndex].getAttribute('data-cost-modifier'));
+          if (isNaN(costModifier)) {
+            costModifier = 1;
+          }
+          let cost = baseCost * costModifier;
+          if (empoweredHeroesElement.checked) {
+            cost *= 0.9;
+          }
+          return 5 * Math.round(cost / 5);
+        }
+        function getXpAndCostFromUpgrades(round, cumulativeXp) {
+          let roundIndex = round - minRound;
+          let levelUpgrades = parseInt(levelUpgradesByRound[roundIndex].value);
+          if (isNaN(levelUpgrades)) {
+            levelUpgrades = 0;
+          }
+          let xp = 0;
+          let cost = 0;
+          for (let i = 0; i < levelUpgrades; i++) {
+            let [level, remainingXp] = getHeroLevelAndNextLevelXp(cumulativeXp);
+            let upgradeCost = getCostToUpgrade(remainingXp);
+            if (!isNaN(upgradeCost)) {
+              cost += upgradeCost;
+            }
+            xp += remainingXp;
+            cumulativeXp += remainingXp;
+          }
+          return [xp, cost];
+        }
+        function getXpFromAdoraSacrifices(round) {
+          let roundIndex = round - minRound;
+          let adoraXp = parseInt(adoraSacrificesByRound[roundIndex].value);
+          if (isNaN(adoraXp)) {
+            adoraXp = 0;
+          }
+          return adoraXp;
+        }
         let cumulativeXpAtStartOfRound = 0;
         let cumulativeAmountSpent = 0;
         for (let round = minRound; round <= maxRound; round++) {
@@ -369,8 +453,10 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
           if (!heroPlacedByRound[roundIndex].checked) {
             cumulativeXpAtStartOfRound = 0;
             cumulativeAmountSpent = 0;
-          } else if (empoweredHeroesElement.checked && (round === minRound || !heroPlacedByRound[roundIndex - 1].checked)) {
-            cumulativeXpAtStartOfRound = getMinimumTotalXpAtLevel(3);
+          } else if (round === minRound || !heroPlacedByRound[roundIndex - 1].checked) {
+            if (empoweredHeroesElement.checked) {
+              cumulativeXpAtStartOfRound = minimumTotalXpAtLevel[2];
+            }
             cumulativeAmountSpent = getHeroPlacementCost();
           }
           let [upgradeXp, amountSpent] = getXpAndCostFromUpgrades(round, cumulativeXpAtStartOfRound);
@@ -393,14 +479,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
             upgradeCostByRound[roundIndex].innerText = '';
             amountSpentByRound[roundIndex].innerText = '';
           }
-          console.log("Round:", round);
-          console.log("  Base XP:", getBaseEndOfRoundXp(round));
-          console.log("  XP Modifier:", getXpModifier(roundIndex));
-          console.log("  Round XP:", getEndOfRoundXp(round));
-          console.log("  Cumulative XP At Start of Round", cumulativeXpAtStartOfRound);
-          console.log("  Level at Start of Round", level);
-          console.log("  XP RemainingToNextLevel", remainingXp);
-          console.log("  Cost to Upgrade", costToUpgrade);
         }
       }
 
@@ -412,140 +490,24 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         return Math.round(costToUpgrade);
       }
 
-      function getBaseEndOfRoundXp(round) {
-        if (round < 21) {
-          return 20 * round + 20;
-        } else if (round < 51) {
-          return 40 * round - 380;
-        } else {
-          return 90 * round - 2880;
-        }
-      }
-
-      function getTotalNumberOfHeroes(roundIndex) {
-        let heroes = parseInt(coopHeroesByRound[roundIndex].value);
-        if (isNaN(heroes)) {
-          heroes = 0;
-        }
-        if (heroPlacedByRound[roundIndex].checked) {
-          heroes += 1;
-        }
-        return heroes;
-      }
-
-      function getXpModifier(roundIndex) {
-        let modifier = getMapExperienceModifier();
-        if (selfTaughtHeroesElement.checked) {
-          modifier *= 1.1;
-        }
-        if (monkeyEducationElement.checked) {
-          modifier *= 1.08;
-        }
-        if (monkeysTogetherStrongElement.checked) {
-          let totalNumberOfHeroes = getTotalNumberOfHeroes(roundIndex);
-          modifier *= 1 + totalNumberOfHeroes * 0.05;
-        }
-        if (energizerByRound[roundIndex].checked) {
-          modifier *= 1.5;
-        }
-        return modifier;
-      }
-
-      function getEndOfRoundXp(round) {
-        let roundIndex = round - minRound;
-        if (!heroPlacedByRound[roundIndex].checked) {
-          return 0;
-        }
-        let totalNumberOfHeroes = getTotalNumberOfHeroes(roundIndex);
-        let xp = getBaseEndOfRoundXp(round) * getXpModifier(roundIndex) / totalNumberOfHeroes;
-        return xp;
-      }
-
-      function getHeroPlacementCost() {
-        let baseCost = parseInt(heroElement.options[heroElement.selectedIndex].getAttribute('data-base-cost'));
-        if (isNaN(baseCost)) {
-          return 0;
-        }
-        let costModifier = parseFloat(modeElement.options[modeElement.selectedIndex].getAttribute('data-cost-modifier'));
-        if (isNaN(costModifier)) {
-          costModifier = 1;
-        }
-        let cost = baseCost * costModifier;
-        if (empoweredHeroesElement.checked) {
-          cost *= 0.9;
-        }
-        return 5 * Math.round(cost / 5);
-      }
-
-      function getXpAndCostFromUpgrades(round, cumulativeXp) {
-        let roundIndex = round - minRound;
-        let levelUpgrades = parseInt(levelUpgradesByRound[roundIndex].value);
-        if (isNaN(levelUpgrades)) {
-          levelUpgrades = 0;
-        }
-        let xp = 0;
-        let cost = 0;
-        for (let i = 0; i < levelUpgrades; i++) {
-          let [level, remainingXp] = getHeroLevelAndNextLevelXp(cumulativeXp);
-          let upgradeCost = getCostToUpgrade(remainingXp);
-          if (!isNaN(upgradeCost)) {
-            cost += upgradeCost;
-          }
-          xp += remainingXp;
-          cumulativeXp += remainingXp;
-        }
-        return [xp, cost];
-      }
-
-      function getXpFromAdoraSacrifices(round) {
-        let roundIndex = round - minRound;
-        let adoraXp = parseInt(adoraSacrificesByRound[roundIndex].value);
-        if (isNaN(adoraXp)) {
-          adoraXp = 0;
-        }
-        return adoraXp;
-      }
-
       function getHeroLevelAndNextLevelXp(cumulativeXp) {
         for (let level = 1; level <= 20; level++) {
-          let minimum = getMinimumTotalXpAtLevel(level);
+          let levelIndex = level - 1;
+          let minimum = minimumTotalXpAtLevel[levelIndex];
           if (cumulativeXp === minimum) {
-            return [level, getMinimumTotalXpAtLevel(level + 1) - getMinimumTotalXpAtLevel(level)];
+            return [level, minimumTotalXpAtLevel[levelIndex + 1] - minimumTotalXpAtLevel[levelIndex]];
           }
           if (cumulativeXp < minimum) {
-            return [level - 1, getMinimumTotalXpAtLevel(level) - cumulativeXp];
+            return [level - 1, minimumTotalXpAtLevel[levelIndex] - cumulativeXp];
           }
         }
         return [20, undefined];
       }
-
-      function getMinimumTotalXpAtLevel(level) {
-        let xp = 0;
-        for (let l = 2; l <= level; l++) {
-          xp += Math.round(baseExperienceByLevel[l - 2] * getHeroXpRatio());
-        }
-        return xp;
-      }
-
-      function getHeroXpRatio() {
-        const heroXpRatio = heroXpRatioElement.value;
-        if (!isNaN(heroXpRatio) && !isNaN(parseFloat(heroXpRatio))) {
-          return parseFloat(heroXpRatio);
-        }
-        return parseFloat(heroElement.options[heroElement.selectedIndex].getAttribute('data-hero-xp-ratio'));
-      }
-
-      function getMapExperienceModifier() {
-        const mapExperience = mapExperienceElement.value;
-        if (!isNaN(mapExperience) && !isNaN(parseFloat(mapExperience))) {
-          return parseFloat(mapExperience);
-        }
-        return parseFloat(mapElement.options[mapElement.selectedIndex].getAttribute('data-map-xp-bonus'));
-      }
-
+      
       heroElement.onchange = function(){
         heroXpRatioElement.value = heroElement.options[heroElement.selectedIndex].getAttribute('data-hero-xp-ratio');
         heroChanged();
+        heroXpRatioChanged();
         recalculate();
       };
       function heroChanged() {
@@ -565,8 +527,22 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         if (parseFloat(this.value) !== parseFloat(heroElement.options[heroElement.selectedIndex].getAttribute('data-hero-xp-ratio'))) {
           heroElement.options[heroElement.options.length - 1].selected = true;
         }
+        heroXpRatioChanged();
         recalculate();
       };
+      function heroXpRatioChanged() {
+        let heroXpRatio = parseFloat(heroXpRatioElement.value);
+        if (isNaN(heroXpRatio)) {
+          heroXpRatio = parseFloat(heroElement.options[heroElement.selectedIndex].getAttribute('data-hero-xp-ratio'));
+        }
+        minimumTotalXpAtLevel.length = 0;
+        minimumTotalXpAtLevel.push(0);
+        for (let level = 2; level <= 20; level++) {
+          let xp = minimumTotalXpAtLevel[minimumTotalXpAtLevel.length - 1];
+          xp += Math.round(baseExperienceByLevel[level - 2] * heroXpRatio);
+          minimumTotalXpAtLevel.push(xp);
+        }
+      }
       mapElement.onchange = function(){
         mapExperienceElement.value = mapElement.options[mapElement.selectedIndex].getAttribute('data-map-xp-bonus');
         recalculate();
@@ -599,6 +575,25 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         }
       }
       function roundsChanged() {
+        function getStartEndRound(isStart) {
+          let element = endRoundElement;
+          let attribute = 'data-end-round';
+          if (isStart) {
+            element = startRoundElement;
+            attribute = 'data-start-round';
+          }
+          let round = parseInt(element.value);
+          if (isNaN(round)) {
+            round = parseInt(modeElement.options[modeElement.selectedIndex].getAttribute(attribute));
+          }
+          if (round < minRound) {
+            round = minRound;
+          }
+          if (round > maxRound) {
+            round = maxRound;
+          }
+          return round;
+        }
         let startRound = getStartEndRound(true);
         let endRound = getStartEndRound(false);
         for (let round = minRound; round <= maxRound; round++) {
@@ -615,26 +610,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
             rowByRound[roundIndex].style.display = '';
           }
         }
-      }
-
-      function getStartEndRound(isStart) {
-        let element = endRoundElement;
-        let attribute = 'data-end-round';
-        if (isStart) {
-          element = startRoundElement;
-          attribute = 'data-start-round';
-        }
-        let round = parseInt(element.value);
-        if (isNaN(round)) {
-          round = parseInt(modeElement.options[modeElement.selectedIndex].getAttribute(attribute));
-        }
-        if (round < minRound) {
-          round = minRound;
-        }
-        if (round > maxRound) {
-          round = maxRound;
-        }
-        return round;
       }
 
       startRoundElement.onchange = function(){
@@ -659,6 +634,22 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         }
         for (let round = minRound; round <= maxRound; round++) {
           coopHeroesByRound[round - 1].value = 0;
+        }
+      }
+      showCostsElement.onchange = function(){
+         for (let element of document.getElementsByClassName('upgrade-cost')) {
+          if (showCostsElement.checked) {
+            element.style.display = '';
+          } else {
+            element.style.display = 'none';
+          }
+        }
+        for (let element of document.getElementsByClassName('amount-spent')) {
+          if (showCostsElement.checked) {
+            element.style.display = '';
+          } else {
+            element.style.display = 'none';
+          }
         }
       }
       allMonkeyKnowledgeElement.onchange = function(){
@@ -713,10 +704,12 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         }
         recalculate();
       };
+      heroXpRatioChanged();
       heroChanged();
       modeChanged();
       roundsChanged();
       coopModeChanged();
+      showCostsElement.onchange();
       recalculate();
     })();
   </script>
