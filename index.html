@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BTD6 Hero Experience Calculator</title>
+  <style>
+    body, h1, select, input, label {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      font: inherit;
+      color: inherit;
+      vertical-align: baseline;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fcfcfc;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    div, section { margin-bottom: 10px; }
+
+    label {
+      font-weight: bold;
+      text-align: right;
+    }
+
+    select, option { min-width: 150px; }
+
+    select, input {
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #fff;
+      font-size: 14px;
+    }
+
+    table select, table input {
+      width: 90%;
+    }
+
+    table.rounds {
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    .rounds th, .rounds td {
+      padding: 8px;
+      text-align: center;
+      border: 1px solid #cccccc;
+    }
+
+    .rounds th {
+      background-color: #e8e8e8;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>BTD6 Hero Experience Calculator</h1>
+  <div class="configuration">
+    <section>
+      <table>
+        <tr>
+          <td><label for="hero">Hero:</label></td>
+          <td>
+            <select name="hero" id="hero">
+              <option value="brickell" data-hero-xp-ratio="1.425" selected="selected">Admiral Brickell</option>
+              <option value="adora" data-hero-xp-ratio="1.71">Adora</option>
+              <option value="benjamin" data-hero-xp-ratio="1.5">Benjamin</option>
+              <option value="churchill" data-hero-xp-ratio="1.71">Captain Churchill</option>
+              <option value="etienne" data-hero-xp-ratio="1">Etienne</option>
+              <option value="ezili" data-hero-xp-ratio="1.425">Ezili</option>
+              <option value="geraldo" data-hero-xp-ratio="1">Geraldo</option>
+              <option value="gwendolin" data-hero-xp-ratio="1">Gwendolin</option>
+              <option value="obyn" data-hero-xp-ratio="1">Obyn Greenfoot</option>
+              <option value="pat" data-hero-xp-ratio="1.425">Pat Fusty</option>
+              <option value="psi" data-hero-xp-ratio="1.5">Psi</option>
+              <option value="quincy" data-hero-xp-ratio="1">Quincy</option>
+              <option value="sauda" data-hero-xp-ratio="1.425">Sauda</option>
+              <option value="striker" data-hero-xp-ratio="1">Striker Jones</option>
+              <option value="custom" data-hero-xp-ratio="1">Custom</option>
+            </select>
+          </td>
+          <td><label for="hero-xp-ratio">Hero XP Ratio:</label></td>
+          <td><input type="text" id="hero-xp-ratio" name="hero-xp-ratio" value="1.425"></td>
+        </tr>
+        <tr>
+          <td><label for="map">Map:</label></td>
+          <td>
+            <select name="map" id="map">
+              <option value="beginner" data-map-xp-bonus="1" selected="selected">Beginner</option>
+              <option value="intermediate" data-map-xp-bonus="1.1">Intermediate</option>
+              <option value="advanced" data-map-xp-bonus="1.2">Advanced</option>
+              <option value="expert" data-map-xp-bonus="1.3">Expert</option>
+              <option value="custom" data-map-xp-bonus="1.3">Custom</option>
+            </select>
+          </td>
+          <td><label for="map-xp-bonus">Map XP Bonus:</label></td>
+          <td><input type="text" id="map-xp-bonus" name="map-xp-bonus" value="1"></td>
+        </tr>
+        <tr>
+          <td><label for="mode">Mode:</label></td>
+          <td>
+            <select name="mode" id="mode">
+              <option value="easy" data-start-round="1" data-end-round="40" selected="selected">Easy</option>
+              <option value="deflation" data-start-round="31" data-end-round="60">Deflation</option>
+              <option value="medium" data-start-round="1" data-end-round="60">Medium</option>
+              <option value="hard" data-start-round="3" data-end-round="80">Hard</option>
+              <option value="impoppable" data-start-round="6" data-end-round="100">Impoppable</option>
+              <option value="chimps" data-start-round="6" data-end-round="100">Chimps</option>
+              <option value="custom" data-start-round="1" data-end-round="140">Custom</option>
+            </select>
+          </td>
+          <td><label for="start-round">Start Round:</label></td>
+          <td><input type="number" id="start-round" name="start-round" value="1" min="1"></td>
+          <td><label for="end-round">End Round:</label></td>
+          <td><input type="number" id="end-round" name="end-round" value="40" max="140"></td>
+        </tr>
+      </table>
+    </section>
+    <section>
+      <label for="coop-mode">Co-Op Mode:</label>
+      <input type="checkbox" id="coop-mode" name="coop-mode">
+    </section>
+    <section id="monkey-knowledge">
+      <div>
+        <label for="all-monkey-knowledge">Monkey Knowledge:</label>
+        <input type="checkbox" id="all-monkey-knowledge" name="all-monkey-knowledge" checked="true">
+      </div>
+      <div title="All monkeys XP earn rate increased by 8%">
+        <input type="checkbox" id="monkey-education" name="monkey-education" checked="true">
+        <label for="monkey-education">Monkey Education</label>
+      </div>
+      <div>
+        <input type="checkbox" id="scholarships" name="scholarships" checked="true">
+        <label for="scholarships" title="Hero training costs reduced by 10%">Scholarships</label>
+      </div>
+      <div>
+        <input type="checkbox" id="self-taught-heroes" name="self-taught-heroes" checked="true">
+        <label for="self-taught-heroes" title="Heroes earn XP 10% faster">Self Taught Heroes</label>
+      </div>
+      <div>
+        <input type="checkbox" id="empowered-heroes" name="empowered-heroes" checked="true">
+        <label for="empowered-heroes" title="Heroes start each game at level 3">Empowered Heroes</label>
+      </div>
+      <div>
+        <input type="checkbox" id="monkeys-together-strong" name="monkeys-together-strong" checked="true">
+        <label for="monkeys-together-strong" title="Heroes receive 5% more experience per each Hero placed">Monkeys Together Strong</label>
+      </div>
+    </section>
+  </div>
+  <section>
+    <table class="rounds">
+      <thead>
+        <th class="round">Round</th>
+        <th class="hero-placed" title="Whether or not the hero is placed before the end of round">Hero Placed</th>
+        <th class="coop-heroes" title="The number of other heroes placed in Co-Op mode before the end of round">Co-Op Heroes</th>
+        <th class="level-upgrades" title="The number of levels the hero is upgraded before the end of round">Level Upgrades</th>
+        <th class="adora-sacrifices" title="The XP gains from Adora tower sacrifices (4x their cost) before the end of round">Adora Sacrifices</th>
+        <th class="energizer" title="Whether or not the hero is within range of a 5xx energizer before the end of round">Energizer</th>
+        <th class="hero-level" title="Hero level at the start of round">Hero Level</th>
+        <th class="upgrade-cost" title="Cost to upgrade hero to the next level at the start of round">Upgrade Cost</th>
+      </thead>
+      <tbody id="rounds-table">
+      </tbody>
+    </table>
+  </section>
+  <script>
+    (function() {
+      const minRound = 1;
+      const maxRound = 140;
+      const baseExperienceByLevel = [180, 460, 1000, 1860, 3280, 5180, 8320, 9380, 13620, 16380, 14400, 16650, 14940, 16380, 17820, 19260, 20700, 16470, 17280];
+      const heroElement = document.getElementById('hero');
+      const heroXpRatioElement = document.getElementById('hero-xp-ratio');
+      const mapElement = document.getElementById('map');
+      const mapExperienceElement = document.getElementById('map-xp-bonus');
+      const modeElement = document.getElementById('mode');
+      const startRoundElement = document.getElementById('start-round');
+      const endRoundElement = document.getElementById('end-round');
+      const coopModeElement = document.getElementById('coop-mode');
+      const allMonkeyKnowledgeElement = document.getElementById('all-monkey-knowledge');
+      const monkeyEducationElement = document.getElementById('monkey-education');
+      const selfTaughtHeroesElement = document.getElementById('self-taught-heroes');
+      const empoweredHeroesElement = document.getElementById('empowered-heroes');
+      const monkeysTogetherStrongElement = document.getElementById('monkeys-together-strong');
+      const scholarshipsElement = document.getElementById('scholarships');
+      const mapXpModifierElement = document.getElementById('map-xp-bonus');
+      const table = document.getElementById('rounds-table');
+
+      const rowByRound = [];
+      const heroPlacedByRound = [];
+      const coopHeroesByRound = [];
+      const levelUpgradesByRound = [];
+      const adoraSacrificesByRound = [];
+      const energizerByRound = [];
+      const heroLevelByRound = [];
+      const upgradeCostByRound = [];
+
+      for (let round = minRound; round <= maxRound; round++) {
+        let row = table.insertRow();
+        rowByRound.push(row);
+        let roundCell = row.insertCell();
+        roundCell.classList.add('round');
+        roundCell.innerText = round;
+
+        let heroPlacedCell = row.insertCell();
+        heroPlacedCell.classList.add('hero-placed');
+        let heroPlacedElement = document.createElement('input');
+        heroPlacedElement.title = 'Whether or not the hero is placed before the end of round ' + round;
+        heroPlacedElement.type = 'checkbox'
+        heroPlacedElement.checked = true;
+        heroPlacedCell.appendChild(heroPlacedElement);
+        heroPlacedByRound.push(heroPlacedElement);
+        heroPlacedElement.onchange = function() {
+          for (let r = round + 1; r <= maxRound; r++) {
+            heroPlacedByRound[r - minRound].checked = this.checked
+          }
+          recalculate();
+        };
+
+        let coopHeroesCell = row.insertCell();
+        coopHeroesCell.classList.add('coop-heroes');
+        let coopHeroesElement = document.createElement('input');
+        coopHeroesElement.title = 'The number of other heroes placed in Co-Op mode before the end of round ' + round;
+        coopHeroesElement.type = 'number'
+        coopHeroesElement.min = 0;
+        coopHeroesElement.max = 3;
+        coopHeroesElement.value = 0;
+        coopHeroesCell.appendChild(coopHeroesElement);
+        coopHeroesByRound.push(coopHeroesElement);
+        coopHeroesElement.onchange = function() {
+          for (let r = round + 1; r <= maxRound; r++) {
+            coopHeroesByRound[r - minRound].value = this.value
+          }
+          recalculate();
+        };
+
+        let levelUpgradesCell = row.insertCell();
+        levelUpgradesCell.classList.add('level-upgrades');
+        let levelUpgradesElement = document.createElement('input');
+        levelUpgradesElement.title = 'The number of levels the hero is upgraded before the end of round ' + round;
+        levelUpgradesElement.type = 'number'
+        levelUpgradesElement.min = 0;
+        levelUpgradesElement.max = 20;
+        levelUpgradesElement.value = 0;
+        levelUpgradesCell.appendChild(levelUpgradesElement);
+        levelUpgradesByRound.push(levelUpgradesElement);
+        levelUpgradesElement.onchange = recalculate;
+
+        let adoraSacrificesCell = row.insertCell();
+        adoraSacrificesCell.classList.add('adora-sacrifices');
+        let adoraSacrificesElement = document.createElement('input');
+        adoraSacrificesElement.title = 'The XP gains from Adora tower sacrifices (4x their cost) before the end of round ' + round;
+        adoraSacrificesElement.type = 'number'
+        adoraSacrificesElement.min = 0;
+        adoraSacrificesElement.value = 0;
+        adoraSacrificesCell.appendChild(adoraSacrificesElement);
+        adoraSacrificesByRound.push(adoraSacrificesElement);
+        adoraSacrificesElement.onchange = recalculate;
+
+        let energizerCell = row.insertCell();
+        energizerCell.classList.add('energizer');
+        let energizerElement = document.createElement('input');
+        energizerElement.title = 'Whether or not the hero is within range of a 5xx energizer before the end of round ' + round;
+        energizerElement.type = 'checkbox'
+        energizerCell.appendChild(energizerElement);
+        energizerByRound.push(energizerElement);
+        energizerElement.onchange = function() {
+          for (let r = round + 1; r <= maxRound; r++) {
+            energizerByRound[r - minRound].checked = this.checked
+          }
+          recalculate();
+        };
+
+        let heroLevelCell = row.insertCell();
+        heroLevelCell.classList.add('hero-level');
+        heroLevelCell.title = 'Hero level at the start of round ' + round;
+        heroLevelCell.innerHtml = '';
+        heroLevelByRound.push(heroLevelCell);
+
+        let upgradeCostCell = row.insertCell();
+        upgradeCostCell.classList.add('upgrade-cost');
+        upgradeCostCell.title = 'Cost to upgrade hero to the next level at the start of round ' + round;
+        upgradeCostCell.innerHtml = '';
+        upgradeCostByRound.push(upgradeCostCell);
+      }
+
+      function recalculate() {
+        let cumulativeXpAtStartOfRound = 0;
+        for (let round = minRound; round <= maxRound; round++) {
+          let roundIndex = round - minRound;
+          if (!heroPlacedByRound[roundIndex].checked) {
+            cumulativeXpAtStartOfRound = 0;
+          } else if (empoweredHeroesElement.checked && (round === minRound || !heroPlacedByRound[roundIndex - 1].checked)) {
+            cumulativeXpAtStartOfRound = getMinimumTotalXpAtLevel(3);
+          }
+          cumulativeXpAtStartOfRound += getXpFromUpgrades(round, cumulativeXpAtStartOfRound);
+          let [level, remainingXp] = getHeroLevelAndNextLevelXp(cumulativeXpAtStartOfRound);
+          let costToUpgrade = getCostToUpgrade(remainingXp);
+          cumulativeXpAtStartOfRound += getEndOfRoundXp(round);
+          if (heroPlacedByRound[roundIndex].checked) {
+            heroLevelByRound[roundIndex].innerText = level;
+            if (isNaN(remainingXp)) {
+              upgradeCostByRound[roundIndex].innerText = '';
+            } else {
+              upgradeCostByRound[roundIndex].innerText = costToUpgrade;
+            }
+          } else {
+            heroLevelByRound[roundIndex].innerText = '';
+            upgradeCostByRound[roundIndex].innerText = '';
+          }
+          console.log("Round:", round);
+          console.log("  Base XP:", getBaseEndOfRoundXp(round));
+          console.log("  XP Modifier:", getXpModifier(roundIndex));
+          console.log("  Round XP:", getEndOfRoundXp(round));
+          console.log("  Cumulative XP At Start of Round", cumulativeXpAtStartOfRound);
+          console.log("  Level at Start of Round", level);
+          console.log("  XP RemainingToNextLevel", remainingXp);
+          console.log("  Cost to Upgrade", costToUpgrade);
+        }
+      }
+
+      function getCostToUpgrade(remainingXp) {
+        let costToUpgrade = remainingXp;
+        if (scholarshipsElement.checked) {
+          costToUpgrade *= 0.9;
+        }
+        return Math.round(costToUpgrade);
+      }
+
+      function getBaseEndOfRoundXp(round) {
+        if (round < 21) {
+          return 20 * round + 20;
+        } else if (round < 51) {
+          return 40 * round - 380;
+        } else {
+          return 90 * round - 2880;
+        }
+      }
+
+      function getTotalNumberOfHeroes(roundIndex) {
+        let heroes = parseInt(coopHeroesByRound[roundIndex].value);
+        if (isNaN(heroes)) {
+          heroes = 0;
+        }
+        if (heroPlacedByRound[roundIndex].checked) {
+          heroes += 1;
+        }
+        return heroes;
+      }
+
+      function getXpModifier(roundIndex) {
+        let modifier = getMapExperienceModifier();
+        if (selfTaughtHeroesElement.checked) {
+          modifier *= 1.1;
+        }
+        if (monkeyEducationElement.checked) {
+          modifier *= 1.08;
+        }
+        if (monkeysTogetherStrongElement.checked) {
+          let totalNumberOfHeroes = getTotalNumberOfHeroes(roundIndex);
+          modifier *= 1 + totalNumberOfHeroes * 0.05;
+        }
+        if (energizerByRound[roundIndex].checked) {
+          modifier *= 1.5;
+        }
+        return modifier;
+      }
+
+      function getEndOfRoundXp(round) {
+        let roundIndex = round - minRound;
+        if (!heroPlacedByRound[roundIndex].checked) {
+          return 0;
+        }
+        let totalNumberOfHeroes = getTotalNumberOfHeroes(roundIndex);
+        let xp = getBaseEndOfRoundXp(round) * getXpModifier(roundIndex) / totalNumberOfHeroes;
+        return xp;
+      }
+
+      function getXpFromUpgrades(round, cumulativeXp) {
+        let roundIndex = round - minRound;
+        let levelUpgrades = parseInt(levelUpgradesByRound[roundIndex].value);
+        if (isNaN(levelUpgrades)) {
+          levelUpgrades = 0;
+        }
+        let xp = 0;
+        for (let i = 0; i < levelUpgrades; i++) {
+          let [level, remainingXp] = getHeroLevelAndNextLevelXp(cumulativeXp);
+          xp += remainingXp;
+          cumulativeXp += remainingXp;
+        }
+        let adoraXp = parseInt(adoraSacrificesByRound[roundIndex].value);
+        if (isNaN(adoraXp)) {
+          adoraXp = 0;
+        }
+        xp += adoraXp;
+        console.log('  Upgrade XP:', xp);
+        return xp;
+      }
+
+      function getHeroLevelAndNextLevelXp(cumulativeXp) {
+        for (let level = 1; level <= 20; level++) {
+          let minimum = getMinimumTotalXpAtLevel(level);
+          if (cumulativeXp === minimum) {
+            return [level, getMinimumTotalXpAtLevel(level + 1) - getMinimumTotalXpAtLevel(level)];
+          }
+          if (cumulativeXp < minimum) {
+            return [level - 1, getMinimumTotalXpAtLevel(level) - cumulativeXp];
+          }
+        }
+        return [20, undefined];
+      }
+
+      function getMinimumTotalXpAtLevel(level) {
+        let xp = 0;
+        for (let l = 2; l <= level; l++) {
+          xp += Math.round(baseExperienceByLevel[l - 2] * getHeroXpRatio());
+        }
+        return xp;
+      }
+
+      function getHeroXpRatio() {
+        const heroXpRatio = heroXpRatioElement.value;
+        if (!isNaN(heroXpRatio) && !isNaN(parseFloat(heroXpRatio))) {
+          return parseFloat(heroXpRatio);
+        }
+        return parseFloat(heroElement.options[heroElement.selectedIndex].getAttribute('data-hero-xp-ratio'));
+      }
+
+      function getMapExperienceModifier() {
+        const mapExperience = mapExperienceElement.value;
+        if (!isNaN(mapExperience) && !isNaN(parseFloat(mapExperience))) {
+          return parseFloat(mapExperience);
+        }
+        return parseFloat(mapElement.options[mapElement.selectedIndex].getAttribute('data-map-xp-bonus'));
+      }
+
+      heroElement.onchange = function(){
+        heroXpRatioElement.value = heroElement.options[heroElement.selectedIndex].getAttribute('data-hero-xp-ratio');
+        heroChanged();
+        recalculate();
+      };
+      function heroChanged() {
+        let isAdora = heroElement.value === 'adora';
+        for (let element of document.getElementsByClassName('adora-sacrifices')) {
+          if (isAdora) {
+            element.style.display = '';
+          } else {
+            element.style.display = 'none';
+          }
+        }
+        for (let round = minRound; round <= maxRound; round++) {
+          adoraSacrificesByRound[round - 1].value = 0;
+        }
+      }
+      heroXpRatioElement.onchange = function(){
+        if (parseFloat(this.value) !== parseFloat(heroElement.options[heroElement.selectedIndex].getAttribute('data-hero-xp-ratio'))) {
+          heroElement.options[heroElement.options.length - 1].selected = true;
+        }
+        recalculate();
+      };
+      mapElement.onchange = function(){
+        mapExperienceElement.value = mapElement.options[mapElement.selectedIndex].getAttribute('data-map-xp-bonus');
+        recalculate();
+      };
+      mapExperienceElement.onchange = function(){
+        if (parseFloat(this.value) !== parseFloat(mapElement.options[mapElement.selectedIndex].getAttribute('data-map-xp-bonus'))) {
+          mapElement.options[mapElement.options.length - 1].selected = true;
+        }
+        recalculate();
+      };
+      modeElement.onchange = function(){
+        startRoundElement.value = modeElement.options[modeElement.selectedIndex].getAttribute('data-start-round');
+        endRoundElement.value = modeElement.options[modeElement.selectedIndex].getAttribute('data-end-round');
+        modeChanged();
+        roundsChanged();
+        recalculate();
+      };
+      function modeChanged() {
+        let mk = document.getElementById('monkey-knowledge');
+        if (modeElement.value == 'chimps') {
+          mk.style.display = 'none';
+          allMonkeyKnowledgeElement.checked = false;
+          monkeyEducationElement.checked = false;
+          scholarshipsElement.checked = false;
+          selfTaughtHeroesElement.checked = false;
+          empoweredHeroesElement.checked = false;
+          monkeysTogetherStrongElement.checked = false;
+        } else {
+          mk.style.display = '';
+        }
+      }
+      function roundsChanged() {
+        let startRound = getStartEndRound(true);
+        let endRound = getStartEndRound(false);
+        for (let round = minRound; round <= maxRound; round++) {
+          let roundIndex = round - 1;
+          if (round < startRound) {
+            rowByRound[roundIndex].style.display = 'none';
+            heroPlacedByRound[roundIndex].checked = false;
+            coopHeroesByRound[roundIndex].value = 0;
+            levelUpgradesByRound[roundIndex].value = 0;
+            energizerByRound[roundIndex].checked = false;
+          } else if (round > endRound) {
+            rowByRound[roundIndex].style.display = 'none';
+          } else {
+            rowByRound[roundIndex].style.display = '';
+          }
+        }
+      }
+
+      function getStartEndRound(isStart) {
+        let element = endRoundElement;
+        let attribute = 'data-end-round';
+        if (isStart) {
+          element = startRoundElement;
+          attribute = 'data-start-round';
+        }
+        let round = parseInt(element.value);
+        if (isNaN(round)) {
+          round = parseInt(modeElement.options[modeElement.selectedIndex].getAttribute(attribute));
+        }
+        if (round < minRound) {
+          round = minRound;
+        }
+        if (round > maxRound) {
+          round = maxRound;
+        }
+        return round;
+      }
+
+      startRoundElement.onchange = function(){
+        roundsChanged();
+        recalculate();
+      };
+      endRoundElement.onchange = function(){
+        roundsChanged();
+        recalculate();
+      };
+      coopModeElement.onchange = function(){
+        coopModeChanged();
+        recalculate();
+      }
+      function coopModeChanged() {
+        for (let element of document.getElementsByClassName('coop-heroes')) {
+          if (coopModeElement.checked) {
+            element.style.display = '';
+          } else {
+            element.style.display = 'none';
+          }
+        }
+        for (let round = minRound; round <= maxRound; round++) {
+          coopHeroesByRound[round - 1].value = 0;
+        }
+      }
+      allMonkeyKnowledgeElement.onchange = function(){
+        monkeyEducationElement.checked = this.checked;
+        scholarshipsElement.checked = this.checked;
+        selfTaughtHeroesElement.checked = this.checked;
+        empoweredHeroesElement.checked = this.checked;
+        monkeysTogetherStrongElement.checked = this.checked;
+        recalculate();
+      };
+      monkeyEducationElement.onchange = function(){
+        allMonkeyKnowledgeElement.checked = monkeysTogetherStrongElement.checked && monkeyEducationElement.checked;
+        recalculate();
+      };
+      monkeysTogetherStrongElement.onchange = function(){
+        if (this.checked) {
+          empoweredHeroesElement.checked = true;
+          selfTaughtHeroesElement.checked = true;
+          scholarshipsElement.checked = true;
+          allMonkeyKnowledgeElement.checked = monkeyEducationElement.checked;
+        } else {
+          allMonkeyKnowledgeElement.checked = false;
+        }
+        recalculate();
+      };
+      empoweredHeroesElement.onchange = function(){
+        if (this.checked) {
+          selfTaughtHeroesElement.checked = true;
+          scholarshipsElement.checked = true;
+        } else {
+          monkeysTogetherStrongElement.checked = false;
+          allMonkeyKnowledgeElement.checked = false;
+        }
+        recalculate();
+      };
+      selfTaughtHeroesElement.onchange = function(){
+        if (this.checked) {
+          scholarshipsElement.checked = true;
+        } else {
+          empoweredHeroesElement.checked = false;
+          monkeysTogetherStrongElement.checked = false;
+          allMonkeyKnowledgeElement.checked = false;
+        }
+        recalculate();
+      };
+      scholarshipsElement.onchange = function(){
+        if (!this.checked) {
+          selfTaughtHeroesElement.checked = false;
+          empoweredHeroesElement.checked = false;
+          monkeysTogetherStrongElement.checked = false;
+          allMonkeyKnowledgeElement.checked = false;
+        }
+        recalculate();
+      };
+      heroChanged();
+      modeChanged();
+      roundsChanged();
+      coopModeChanged();
+      recalculate();
+    })();
+  </script>
+</body>
+</html>
