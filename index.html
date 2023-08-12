@@ -466,15 +466,15 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         if (isNaN(baseCost)) {
           return 0;
         }
-        let costModifier = parseFloat(mapElement.options[mapElement.selectedIndex].getAttribute('data-cost-modifier'));
+        let costModifier = parseFloat(modeElement.options[modeElement.selectedIndex].getAttribute('data-cost-modifier'));
         if (isNaN(costModifier)) {
           costModifier = 1;
         }
+        let cost = baseCost * costModifier;
         if (empoweredHeroesElement.checked) {
-          return baseCost * costModifier * 0.9;
-        } else {
-          return baseCost * costModifier;
+          cost *= 0.9;
         }
+        return 5 * Math.round(cost / 5);
       }
 
       function getXpAndCostFromUpgrades(round, cumulativeXp) {
