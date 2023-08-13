@@ -227,7 +227,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         <th class="hero-placed" title="Whether or not the hero is placed before the end of round">Hero Placed</th>
         <th class="coop-heroes" title="The number of other heroes placed in Co-Op mode before the end of round">Co-Op Heroes</th>
         <th class="level-upgrades" title="The number of levels the hero is upgraded before the end of round">Level Upgrades</th>
-        <th class="adora-sacrifices" title="The XP gains from Adora tower sacrifices (4x their cost) before the end of round">Adora Sacrifices</th>
+        <th class="adora-sacrifices" title="The cost of the towers sacrificed by Adora before the end of round">Adora Sacrifices</th>
         <th class="energizer" title="Whether or not the hero is within range of a 5xx energizer before the end of round">Energizer</th>
         <th class="hero-level" title="Hero level at the start of round">Hero Level</th>
         <th class="upgrade-cost" title="Cost to upgrade hero to the next level at the start of round">Upgrade Cost</th>
@@ -325,7 +325,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         let adoraSacrificesCell = row.insertCell();
         adoraSacrificesCell.classList.add('adora-sacrifices');
         let adoraSacrificesElement = document.createElement('input');
-        adoraSacrificesElement.title = 'The XP gains from Adora tower sacrifices (4x their cost) before the end of round ' + round;
+        adoraSacrificesElement.title = 'The cost of the towers sacrificed by Adora before the end of round ' + round;
         adoraSacrificesElement.type = 'number'
         adoraSacrificesElement.min = 0;
         adoraSacrificesElement.value = 0;
@@ -367,11 +367,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
       }
 
       function recalculate() {
-        function getEndOfRoundXp(round) {
-          let roundIndex = round - minRound;
-          if (!heroPlacedByRound[roundIndex].checked) {
-            return 0;
-          }
+        function getTotalHeroesPlaced(roundIndex) {
           let totalNumberOfHeroes = parseInt(coopHeroesByRound[roundIndex].value);
           if (isNaN(totalNumberOfHeroes)) {
             totalNumberOfHeroes = 0;
@@ -379,6 +375,14 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
           if (heroPlacedByRound[roundIndex].checked) {
             totalNumberOfHeroes += 1;
           }
+          return totalNumberOfHeroes;
+        }
+        function getEndOfRoundXp(round) {
+          let roundIndex = round - minRound;
+          if (!heroPlacedByRound[roundIndex].checked) {
+            return 0;
+          }
+          let totalNumberOfHeroes = getTotalHeroesPlaced(roundIndex);
           let baseEndOfRoundXp = 90 * round - 2880;
           if (round < 21) {
             baseEndOfRoundXp = 20 * round + 20;
@@ -440,9 +444,17 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         }
         function getXpFromAdoraSacrifices(round) {
           let roundIndex = round - minRound;
-          let adoraXp = parseInt(adoraSacrificesByRound[roundIndex].value);
-          if (isNaN(adoraXp)) {
-            adoraXp = 0;
+          let adoraSacrifices = parseInt(adoraSacrificesByRound[roundIndex].value);
+          if (isNaN(adoraSacrifices)) {
+            adoraSacrifices = 0;
+          }
+          let adoraXp = adoraSacrifices * 4;
+          if (energizerByRound[roundIndex].checked) {
+            adoraXp *= 1.5;
+          }
+          if (monkeysTogetherStrongElement.checked) {
+            let totalNumberOfHeroes = getTotalHeroesPlaced(roundIndex);
+            adoraXp *= 1 + 0.05 * totalNumberOfHeroes
           }
           return adoraXp;
         }
