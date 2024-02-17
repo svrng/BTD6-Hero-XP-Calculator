@@ -1,6 +1,6 @@
 <!doctype html>
 <!--
-Copyright © 2023
+Copyright © 2023-2024
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the “Software”), to deal in the Software without
 restriction, including without limitation the rights to use, copy, modify, merge, publish,
@@ -126,6 +126,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
           <option value="brickell" data-hero-xp-ratio="1.425" data-base-cost="900" selected="selected">Admiral Brickell</option>
           <option value="adora" data-hero-xp-ratio="1.71" data-base-cost="1000">Adora</option>
           <option value="benjamin" data-hero-xp-ratio="1.5" data-base-cost="1200">Benjamin</option>
+          <option value="corvus" data-hero-xp-ratio="1.71" data-base-cost="925">Corvus</option>
           <option value="churchill" data-hero-xp-ratio="1.71" data-base-cost="2000">Captain Churchill</option>
           <option value="etienne" data-hero-xp-ratio="1" data-base-cost="850">Etienne</option>
           <option value="ezili" data-hero-xp-ratio="1.425" data-base-cost="600">Ezili</option>
@@ -228,6 +229,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         <th class="coop-heroes" title="The number of other heroes placed in Co-Op mode before the end of round">Co-Op Heroes</th>
         <th class="level-upgrades" title="The number of levels the hero is upgraded before the end of round">Level Upgrades</th>
         <th class="adora-sacrifices" title="The cost of the towers sacrificed by Adora before the end of round">Adora Sacrifices</th>
+        <th class="corvus-nourishment" title="The total mana drained by Corvus' nourishment before the end of round">Corvus Nourishment</th>
         <th class="energizer" title="Whether or not the hero is within range of a 5xx energizer before the end of round">Energizer</th>
         <th class="hero-level" title="Hero level at the start of round">Hero Level</th>
         <th class="upgrade-cost" title="Cost to upgrade hero to the next level at the start of round">Upgrade Cost</th>
@@ -265,6 +267,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
       const coopHeroesByRound = [];
       const levelUpgradesByRound = [];
       const adoraSacrificesByRound = [];
+      const corvusNourishmentByRound = [];
       const energizerByRound = [];
       const heroLevelByRound = [];
       const upgradeCostByRound = [];
@@ -332,6 +335,17 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         adoraSacrificesCell.appendChild(adoraSacrificesElement);
         adoraSacrificesByRound.push(adoraSacrificesElement);
         adoraSacrificesElement.onchange = recalculate;
+
+        let corvusNourishmentCell = row.insertCell();
+        corvusNourishmentCell.classList.add('corvus-nourishment');
+        let corvusNourishmentElement = document.createElement('input');
+        corvusNourishmentElement.title = "The total mana drained by Corvus' nourishment before the end of round " + round;
+        corvusNourishmentElement.type = 'number'
+        corvusNourishmentElement.min = 0;
+        corvusNourishmentElement.value = 0;
+        corvusNourishmentCell.appendChild(corvusNourishmentElement);
+        corvusNourishmentByRound.push(corvusNourishmentElement);
+        corvusNourishmentElement.onchange = recalculate;
 
         let energizerCell = row.insertCell();
         energizerCell.classList.add('energizer');
@@ -458,6 +472,29 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
           }
           return adoraXp;
         }
+        function getXpFromCorvusNourishment(round, level) {
+          let roundIndex = round - minRound;
+          let corvusNourishment = parseInt(corvusNourishmentByRound[roundIndex].value);
+          if (isNaN(corvusNourishment)) {
+            corvusNourishment = 0;
+          }
+          let nourishmentRatio = 2;
+          if (level >= 15) {
+              nourishmentRatio = 4;
+          }
+          if (level >= 20) {
+              nourishmentRatio = 0;
+          }
+          let corvusXp = corvusNourishment * nourishmentRatio;
+          if (energizerByRound[roundIndex].checked) {
+            corvusXp *= 1.5;
+          }
+          if (monkeysTogetherStrongElement.checked) {
+            let totalNumberOfHeroes = getTotalHeroesPlaced(roundIndex);
+            corvusXp *= 1 + 0.05 * totalNumberOfHeroes
+          }
+          return corvusXp;
+        }
         let cumulativeXpAtStartOfRound = 0;
         let cumulativeAmountSpent = 0;
         for (let round = minRound; round <= maxRound; round++) {
@@ -475,6 +512,8 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
           cumulativeAmountSpent += amountSpent;
           cumulativeXpAtStartOfRound += upgradeXp;
           cumulativeXpAtStartOfRound += getXpFromAdoraSacrifices(round);
+          let [levelForCorvusNourishment, _] = getHeroLevelAndNextLevelXp(cumulativeXpAtStartOfRound);
+          cumulativeXpAtStartOfRound += getXpFromCorvusNourishment(round, levelForCorvusNourishment);
           let [level, remainingXp] = getHeroLevelAndNextLevelXp(cumulativeXpAtStartOfRound);
           let costToUpgrade = getCostToUpgrade(remainingXp);
           cumulativeXpAtStartOfRound += getEndOfRoundXp(round);
@@ -531,8 +570,17 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
             element.style.display = 'none';
           }
         }
+        let isCorvus = heroElement.value === 'corvus';
+        for (let element of document.getElementsByClassName('corvus-nourishment')) {
+          if (isCorvus) {
+            element.style.display = '';
+          } else {
+            element.style.display = 'none';
+          }
+        }
         for (let round = minRound; round <= maxRound; round++) {
           adoraSacrificesByRound[round - 1].value = 0;
+          corvusNourishmentByRound[round - 1].value = 0;
         }
       }
       heroXpRatioElement.onchange = function(){
