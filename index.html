@@ -232,7 +232,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         <th class="coop-heroes" title="The number of other heroes placed in Co-Op mode before the end of round">Co-Op Heroes</th>
         <th class="level-upgrades" title="The number of levels the hero is upgraded before the end of round">Level Upgrades</th>
         <th class="adora-sacrifices" title="The cost of the towers sacrificed by Adora before the end of round">Adora Sacrifices</th>
-        <th class="corvus-nourishment" title="The total mana drained by Corvus' nourishment before the end of round">Corvus Nourishment</th>
         <th class="silas-t3-ice-monkeys" title="The number of Tier 3 (or higher) Ice Monkeys in range of Silas">T3 Ice Monkeys</th>
         <th class="energizer" title="Whether or not the hero is within range of a 5xx energizer before the end of round">Energizer</th>
         <th class="hero-level" title="Hero level at the start of round">Hero Level</th>
@@ -271,7 +270,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
       const coopHeroesByRound = [];
       const levelUpgradesByRound = [];
       const adoraSacrificesByRound = [];
-      const corvusNourishmentByRound = [];
       const silasT3IceMonkeysByRound = [];
       const energizerByRound = [];
       const heroLevelByRound = [];
@@ -340,17 +338,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         adoraSacrificesCell.appendChild(adoraSacrificesElement);
         adoraSacrificesByRound.push(adoraSacrificesElement);
         adoraSacrificesElement.onchange = recalculate;
-
-        let corvusNourishmentCell = row.insertCell();
-        corvusNourishmentCell.classList.add('corvus-nourishment');
-        let corvusNourishmentElement = document.createElement('input');
-        corvusNourishmentElement.title = "The total mana drained by Corvus' nourishment before the end of round " + round;
-        corvusNourishmentElement.type = 'number'
-        corvusNourishmentElement.min = 0;
-        corvusNourishmentElement.value = 0;
-        corvusNourishmentCell.appendChild(corvusNourishmentElement);
-        corvusNourishmentByRound.push(corvusNourishmentElement);
-        corvusNourishmentElement.onchange = recalculate;
 
         let silasT3IceMonkeysCell = row.insertCell();
         silasT3IceMonkeysCell.classList.add('silas-t3-ice-monkeys');
@@ -495,29 +482,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
           }
           return adoraXp;
         }
-        function getXpFromCorvusNourishment(round, level) {
-          let roundIndex = round - minRound;
-          let corvusNourishment = parseInt(corvusNourishmentByRound[roundIndex].value);
-          if (isNaN(corvusNourishment)) {
-            corvusNourishment = 0;
-          }
-          let nourishmentRatio = 2;
-          if (level >= 15) {
-              nourishmentRatio = 4;
-          }
-          if (level >= 20) {
-              nourishmentRatio = 0;
-          }
-          let corvusXp = corvusNourishment * nourishmentRatio;
-          if (energizerByRound[roundIndex].checked) {
-            corvusXp *= 1.5;
-          }
-          if (monkeysTogetherStrongElement.checked) {
-            let totalNumberOfHeroes = getTotalHeroesPlaced(roundIndex);
-            corvusXp *= 1 + 0.05 * totalNumberOfHeroes
-          }
-          return corvusXp;
-        }
         function getXpMultiplierFromSilasT3IceMonkeys(round, level) {
           if (heroElement.value !== 'silas') {
             return 1;
@@ -549,8 +513,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
           cumulativeAmountSpent += amountSpent;
           cumulativeXpAtStartOfRound += upgradeXp;
           cumulativeXpAtStartOfRound += getXpFromAdoraSacrifices(round);
-          let [levelForCorvusNourishment, _] = getHeroLevelAndNextLevelXp(cumulativeXpAtStartOfRound);
-          cumulativeXpAtStartOfRound += getXpFromCorvusNourishment(round, levelForCorvusNourishment);
           let [level, remainingXp] = getHeroLevelAndNextLevelXp(cumulativeXpAtStartOfRound);
           let costToUpgrade = getCostToUpgrade(remainingXp);
           cumulativeXpAtStartOfRound += getEndOfRoundXp(round, level);
@@ -607,14 +569,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
             element.style.display = 'none';
           }
         }
-        let isCorvus = heroElement.value === 'corvus';
-        for (let element of document.getElementsByClassName('corvus-nourishment')) {
-          if (isCorvus) {
-            element.style.display = '';
-          } else {
-            element.style.display = 'none';
-          }
-        }
         let isSilas = heroElement.value === 'silas'
         for (let element of document.getElementsByClassName('silas-t3-ice-monkeys')) {
           if (isSilas) {
@@ -625,7 +579,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         }
         for (let round = minRound; round <= maxRound; round++) {
           adoraSacrificesByRound[round - 1].value = 0;
-          corvusNourishmentByRound[round - 1].value = 0;
           silasT3IceMonkeysByRound[round - 1].value = 0;
         }
       }
